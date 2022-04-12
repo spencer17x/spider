@@ -20,7 +20,6 @@ type Section struct {
 func main() {
 
 	if _, err := ioutil.ReadFile(config.CookieFile); err != nil {
-		log.Println(err)
 		task.Login()
 	}
 
@@ -37,12 +36,19 @@ func main() {
 
 	var sectionListResponse struct {
 		Data struct {
+			Booklet struct {
+				BaseInfo struct {
+					Title string `json:"title"`
+				}
+			}
 			Sections []*Section
 		}
 	}
 	if err := json.Unmarshal(sectionListBytes, &sectionListResponse); err != nil {
 		panic(err)
 	}
+
+	bookTitle := sectionListResponse.Data.Booklet.BaseInfo.Title
 
 	for sectionIndex, section := range sectionListResponse.Data.Sections {
 		bytes, sectionResponseErr := fetcher.FetchSectionContent(section.SectionId)
@@ -52,6 +58,7 @@ func main() {
 		log.Printf("SectionIndex: %d", sectionIndex)
 		log.Printf("Section: %s", section.Title)
 		log.Printf("SectionId: %s", section.SectionId)
+		dir := fmt.Sprintf(`%s/%s`, config.SavePath, bookTitle)
 		filename := fmt.Sprintf(`%d.%s.md`, sectionIndex+1, section.Title)
 
 		var sectionContentResponse struct {
@@ -64,7 +71,11 @@ func main() {
 		if err := json.Unmarshal(bytes, &sectionContentResponse); err != nil {
 			panic(err)
 		}
-		if saveErr := utils.SaveFile(filename, sectionContentResponse.Data.Section.MarkdownShow); saveErr != nil {
+		if saveErr := utils.SaveFile(
+			dir,
+			filename,
+			sectionContentResponse.Data.Section.MarkdownShow,
+		); saveErr != nil {
 			panic(saveErr)
 		}
 	}

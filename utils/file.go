@@ -8,9 +8,9 @@ import (
 )
 
 // SaveFile save file with content
-func SaveFile(filename, content string) error {
-	if _, err := ioutil.ReadDir(config.SavePath); err != nil {
-		if osMkdirErr := os.Mkdir(config.SavePath, os.ModePerm); osMkdirErr != nil {
+func SaveFile(dir, filename, content string) error {
+	if _, err := ioutil.ReadDir(dir); err != nil {
+		if osMkdirErr := os.Mkdir(dir, os.ModePerm); osMkdirErr != nil {
 			return osMkdirErr
 		}
 	}

@@ -77,7 +77,7 @@ func FetchSectionContent(sectionId string) ([]byte, error) {
 	if sessionId == "" {
 		return nil, fmt.Errorf("sessionid is empty")
 	}
-	req.Header.Add("cookie", sessionId)
+	req.Header.Add("cookie", fmt.Sprintf("sessionid=%s", sessionId))
 
 	res, err := client.Do(req)
 	if err != nil {
