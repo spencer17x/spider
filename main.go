@@ -39,8 +39,8 @@ func main() {
 			Booklet struct {
 				BaseInfo struct {
 					Title string `json:"title"`
-				}
-			}
+				} `json:"base_info"`
+			} `json:"booklet"`
 			Sections []*Section
 		}
 	}
@@ -78,5 +78,6 @@ func main() {
 		); saveErr != nil {
 			panic(saveErr)
 		}
+		log.Println("done.")
 	}
 }

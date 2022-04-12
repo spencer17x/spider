@@ -3,8 +3,8 @@ package utils
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
-	"spider/config"
 )
 
 // SaveFile save file with content
@@ -14,8 +14,9 @@ func SaveFile(dir, filename, content string) error {
 			return osMkdirErr
 		}
 	}
+	log.Println("dir", dir)
 	f, err := os.Create(
-		fmt.Sprintf(`%s/%s`, config.SavePath, filename),
+		fmt.Sprintf(`%s/%s`, dir, filename),
 	)
 	if err != nil {
 		return err
