@@ -21,18 +21,18 @@ func SaveCookie() chromedp.ActionFunc {
 
 		cookies, err := network.GetAllCookies().Do(ctx)
 		if err != nil {
-			return
+			return err
 		}
-		
+
 		cookiesData, err := network.GetAllCookiesReturns{Cookies: cookies}.MarshalJSON()
 		if err != nil {
-			return
+			return err
 		}
 
 		if err = ioutil.WriteFile(config.CookieFile, cookiesData, 0755); err != nil {
-			return
+			return err
 		}
-		return
+		return nil
 	}
 }
 

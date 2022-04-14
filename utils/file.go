@@ -10,7 +10,7 @@ import (
 // SaveFile save file with content
 func SaveFile(dir, filename, content string) error {
 	if _, err := ioutil.ReadDir(dir); err != nil {
-		if osMkdirErr := os.Mkdir(dir, os.ModePerm); osMkdirErr != nil {
+		if osMkdirErr := os.MkdirAll(dir, os.ModePerm); osMkdirErr != nil {
 			return osMkdirErr
 		}
 	}
