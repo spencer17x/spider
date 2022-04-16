@@ -1,4 +1,4 @@
-package utils
+package task
 
 import (
 	"bytes"
@@ -12,42 +12,42 @@ import (
 	"log"
 )
 
-func PrintQRCode(code []byte) (err error) {
+// printQrCode print qr code to terminal
+func printQrCode(code []byte) (err error) {
 	img, _, err := image.Decode(bytes.NewReader(code))
 	if err != nil {
-		return
+		return err
 	}
 
 	bmp, err := gozxing.NewBinaryBitmapFromImage(img)
 	if err != nil {
-		return
+		return err
 	}
 
 	res, err := qrcode.NewQRCodeReader().Decode(bmp, nil)
 	if err != nil {
-		return
+		return err
 	}
 	qr, err := goQrcode.New(res.String(), goQrcode.High)
 	if err != nil {
-		return
+		return err
 	}
 
 	fmt.Println(qr.ToSmallString(false))
-	return
+	return nil
 }
 
-func GetQRCode() chromedp.ActionFunc {
-	return func(ctx context.Context) (err error) {
-		log.Println("get qrcode...")
-		var code []byte
+// getWeChatLoginQrCode get wechat login qr code
+func getWeChatLoginQrCode(ctx context.Context) (err error) {
+	log.Println("getWeChatLoginQrCode...")
+	var code []byte
 
-		if err = chromedp.Screenshot(`.web_qrcode_img`, &code, chromedp.ByQuery).Do(ctx); err != nil {
-			return
-		}
-
-		if err = PrintQRCode(code); err != nil {
-			return err
-		}
-		return
+	if err = chromedp.Screenshot(`.web_qrcode_img`, &code, chromedp.ByQuery).Do(ctx); err != nil {
+		return err
 	}
+
+	if err = printQrCode(code); err != nil {
+		return err
+	}
+	return nil
 }

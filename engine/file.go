@@ -1,4 +1,4 @@
-package utils
+package engine
 
 import (
 	"fmt"
@@ -7,8 +7,8 @@ import (
 	"os"
 )
 
-// SaveFile save file with content
-func SaveFile(dir, filename, content string) error {
+// saveFile save file with content
+func saveFile(dir, filename, content string) error {
 	if _, err := ioutil.ReadDir(dir); err != nil {
 		if osMkdirErr := os.MkdirAll(dir, os.ModePerm); osMkdirErr != nil {
 			return osMkdirErr

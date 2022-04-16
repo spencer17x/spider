@@ -6,7 +6,6 @@ import (
 	"github.com/chromedp/chromedp"
 	"log"
 	"spider/config"
-	"spider/utils"
 	"time"
 )
 
@@ -30,7 +29,7 @@ func newTargetToShowQrCode(ctx context.Context) error {
 	var urlStr string
 	if err := chromedp.Run(newCtx, chromedp.Tasks{
 		chromedp.Location(&urlStr),
-		utils.GetQRCode(),
+		createTask(getWeChatLoginQrCode),
 	}); err != nil {
 		log.Fatal(err)
 	}
