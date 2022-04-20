@@ -8,11 +8,36 @@ import (
 	"spider/fetcher"
 )
 
+type worker struct {
+	in   chan *Section
+	done chan bool
+}
+
 type Section struct {
 	Title     string `json:"title"`
 	SectionId string `json:"section_id"`
 	BookTitle string `json:"book_title"`
 	Index     int    `json:"index"`
+}
+
+func doWorker(id int, sectionChannel chan *Section, done chan bool) {
+	for section := range sectionChannel {
+		if err := downloadSection(section); err != nil {
+			fmt.Printf("worker %d: %s\n, err: %s", id, section.Title, err)
+		} else {
+			fmt.Printf("worker %d: %s\n", id, section.Title)
+		}
+		done <- true
+	}
+}
+
+func createWorker(id int) worker {
+	w := worker{
+		in:   make(chan *Section),
+		done: make(chan bool),
+	}
+	go doWorker(id, w.in, w.done)
+	return w
 }
 
 // downloadSection a downloader for a section
@@ -72,13 +97,18 @@ func downloadBooklet(id string) error {
 	bookTitle := response.Data.Booklet.BaseInfo.Title
 
 	log.Printf("bookTitle: %s", bookTitle)
+	workers := make([]worker, len(response.Data.Sections))
+	for workerId := range workers {
+		workers[workerId] = createWorker(workerId)
+	}
+
 	for index, section := range response.Data.Sections {
-		section.BookTitle = bookTitle
-		section.Index = index + 1
-		log.Printf("SectionIndex: %d", section.Index)
-		if err := downloadSection(section); err != nil {
-			log.Printf("downloadSection error: %s", err)
-		}
+		section.Index = index
+		workers[index].in <- section
+	}
+
+	for _, worker := range workers {
+		<-worker.done
 	}
 
 	return nil
